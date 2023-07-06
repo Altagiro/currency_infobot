@@ -1,5 +1,7 @@
 require: currency/currency.sc
   module = sys.zb-common
+require: number/number.sc
+  module = sys.zb-common
 
 require: scripts/utils.js
 require: scripts/currency.js
@@ -11,7 +13,7 @@ init:
 
 theme: /
     state: GetCurrencyPriceInRubForToday
-        q!: * $Currency *
+        q!: * [$Number] $Currency *
         script:
             var abbreviation = $parseTree._Currency.abbreviation;
             $temp.price = getCurrencyPriceInRubForToday(abbreviation);
@@ -19,8 +21,9 @@ theme: /
             go!: FailedToObtainPrice
         script:
             $temp.trendIsGrowing = $temp.price.value > $temp.price.previous;
-        a: 1 {{capitalizeFirstLetter($parseTree._Currency.name)}} стоит {{getPrettyPriceInRub($temp.price.value)}}
-        a: Тренд идет {{$temp.trendIsGrowing ? "вверх" : "вниз"}}
+            $temp.amount = parseInt($parseTree._Number) || 1;
+        a: {{$temp.amount}} {{$parseTree._Currency.symbol}} – это {{getPrettyPriceInRub($temp.amount * $temp.price.value)}}
+        a: {{capitalizeFirstLetter($parseTree._Currency.name)}} {{$temp.trendIsGrowing ? "растёт" : "теряет"}} в цене
 
         state: FailedToObtainPrice
             a: Не удалось найти цену этой валюты относительно рубля.
