@@ -47,16 +47,21 @@ theme: /
         state: FailedToObtainPrice
             a: Не удалось найти цену этой валюты относительно рубля.
             a: Попробуйте, пожалуйста, указать другую
-
+    
+    state: CallToAction
+        if: !$session.experienced
+            a: Могу подсказать сколько стоила та или иная валюта вчера и сколько стоит сегодня
+            script:
+                $session.experienced = true;
+        a: Какая валюта вас интересует?
     state: Start
         q!: $regex</start>
+        intent!: /привет
         script:
             $jsapi.startSession();
-        a: Начнём.
+        a: Приветствую!
+        go!: /CallToAction
 
-    state: Hello
-        intent!: /привет
-        a: Привет привет
 
     state: Bye
         intent!: /пока
@@ -64,8 +69,8 @@ theme: /
 
     state: NoMatch
         event!: noMatch
-        a: Я не понял. Вы сказали: {{$request.query}}
-
-    state: Match
-        event!: match
-        a: {{$context.intent.answer}}
+        random:
+            a: Не понял о какой валюте идет речь...
+            a: Боюсь ответа на это у меня нет. Зато я знаю курсы валют и могу поделиться этой информацией с вами
+            a: Так-так-так не уверен, что это в моих компетенциях...
+        go!: /CallToAction
