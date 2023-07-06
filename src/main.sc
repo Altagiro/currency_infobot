@@ -1,13 +1,31 @@
 require: currency/currency.sc
   module = sys.zb-common
 
+require: scripts/utils.js
+require: scripts/currency.js
+
+init:
+    $http.config({
+        cacheTimeToLiveInSeconds: 1 * 60 * 30
+    });
+
 theme: /
     state: GetCurrencyPriceInRubForToday
         q!: * $Currency *
         script:
             var abbreviation = $parseTree._Currency.abbreviation;
-            #$temp.priceToday = getCurrencyPriceInRubForToday(abbreviation);
-        a: {{capitalizeFirstLetter($parseTree._Currency.name)}} стоит сегодня Х руб.
+            $temp.price = getCurrencyPriceInRubForToday(abbreviation);
+        if: !$temp.price
+            go!: FailedToObtainPrice
+        script:
+            $temp.trendIsGrowing = $temp.price.value > $temp.price.previous;
+        a: 1 {{capitalizeFirstLetter($parseTree._Currency.name)}} стоит {{getPrettyPriceInRub($temp.price.value)}}
+        a: Тренд идет {{$temp.trendIsGrowing ? "вверх" : "вниз"}}
+
+        state: FailedToObtainPrice
+            a: Не удалось найти цену этой валюты относительно рубля.
+            a: Попробуйте, пожалуйста, указать другую
+
     state: Start
         q!: $regex</start>
         a: Начнём.
