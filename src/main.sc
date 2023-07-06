@@ -14,8 +14,17 @@ theme: /
         q!: * $Currency *
         script:
             var abbreviation = $parseTree._Currency.abbreviation;
-            #$temp.priceToday = getCurrencyPriceInRubForToday(abbreviation);
-        a: {{capitalizeFirstLetter($parseTree._Currency.name)}} стоит сегодня Х руб.
+            $temp.price = getCurrencyPriceInRubForToday(abbreviation);
+        if: !$temp.price
+            go!: FailedToObtainPrice
+        script:
+            $temp.trendIsGrowing = $temp.price.value > $temp.price.previous;
+        a: {{capitalizeFirstLetter($parseTree._Currency.name)}} стоит {{$temp.price.value}} руб.
+        a: Тренд идет {{$temp.trendIsGrowing ? "вверх" : "вниз"}}
+
+        state: FailedToObtainPrice
+            a: Не удалось найти цену этой валюты относительно рубля.
+            a: Попробуйте, пожалуйста, указать другую
 
     state: Start
         q!: $regex</start>

@@ -5,3 +5,15 @@ function getCurrencyInfo() {
         dataType: "json"
     });
 }
+function getCurrencyPriceInRubForToday(abbreviation) {
+    var currencyInfoResponse = getCurrencyInfo();
+    if (!currencyInfoResponse.isOk || !currencyInfoResponse.data.Valute[abbreviation]) {
+        return null;
+    }
+    var selectedCurrency = currencyInfoResponse.data.Valute[abbreviation];
+    
+    return {
+        value: selectedCurrency.Value,
+        previous: selectedCurrency.Previous
+    }
+}
