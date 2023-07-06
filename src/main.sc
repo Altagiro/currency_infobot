@@ -1,6 +1,14 @@
 require: currency/currency.sc
   module = sys.zb-common
 
+require: scripts/utils.js
+require: scripts/currency.js
+
+init:
+    $http.config({
+        cacheTimeToLiveInSeconds: 1 * 60 * 30
+    });
+
 theme: /
     state: GetCurrencyPriceInRubForToday
         q!: * $Currency *
@@ -8,6 +16,7 @@ theme: /
             var abbreviation = $parseTree._Currency.abbreviation;
             #$temp.priceToday = getCurrencyPriceInRubForToday(abbreviation);
         a: {{capitalizeFirstLetter($parseTree._Currency.name)}} стоит сегодня Х руб.
+
     state: Start
         q!: $regex</start>
         a: Начнём.
