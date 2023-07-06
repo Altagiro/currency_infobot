@@ -11,19 +11,28 @@ init:
         cacheTimeToLiveInSeconds: 1 * 60 * 30
     });
 
+patterns:
+    # добавил тк по "доллар" сущности из коммона не активируются
+    $myCurrency = (~доллар:2/~рубль:27) || converter = function(pt){return $Currencies[pt.value].value;}
 theme: /
-    state: GetCurrencyPriceInRubForToday
-        q!: * [$Number] $Currency *
+    state: GetCurrencyPriceInRub
+        q!: * ([$Number] ($Currency/$myCurrency::Currency)) * :value *
+        q!: * {([$Number] ($Currency/$myCurrency::Currency)) * (вчера:previous)} *
         script:
             var abbreviation = $parseTree._Currency.abbreviation;
-            $temp.price = getCurrencyPriceInRubForToday(abbreviation);
+            $temp.price = getCurrencyPrice(abbreviation);
         if: !$temp.price
             go!: FailedToObtainPrice
         script:
-            $temp.trendIsGrowing = $temp.price.value > $temp.price.previous;
-            $temp.amount = parseInt($parseTree._Number) || 1;
-        a: {{$temp.amount}} {{$parseTree._Currency.symbol}} – это {{getPrettyPriceInRub($temp.amount * $temp.price.value)}}
-        a: {{capitalizeFirstLetter($parseTree._Currency.name)}} {{$temp.trendIsGrowing ? "растёт" : "теряет"}} в цене
+            var amount = parseInt($parseTree._Number) || 1;
+            $temp.currency = amount + $parseTree._Currency.symbol;
+            $temp.when = $parseTree.value === "previous" ? "Вчера" : "Сегодня";
+            var price = $temp.price[$parseTree.value];
+            $temp.prettyPrice = getPrettyPriceInRub(amount * $temp.price.value);
+            $temp.trendVerb = $temp.price.value > $temp.price.previous ? "растёт" : "теряет"
+            
+        a: {{$temp.when}} {{$temp.currency}} – это {{$temp.prettyPrice}}
+        a: {{capitalizeFirstLetter($parseTree._Currency.name)}} {{$temp.trendVerb}} в цене
 
         state: FailedToObtainPrice
             a: Не удалось найти цену этой валюты относительно рубля.

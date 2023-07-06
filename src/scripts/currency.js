@@ -5,7 +5,7 @@ function getCurrencyInfo() {
         dataType: "json"
     });
 }
-function getCurrencyPriceInRubForToday(abbreviation) {
+function getCurrencyPrice(abbreviation) {
     var currencyInfoResponse = getCurrencyInfo();
     if (!currencyInfoResponse.isOk || !currencyInfoResponse.data.Valute[abbreviation]) {
         return null;
