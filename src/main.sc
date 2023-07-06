@@ -43,7 +43,7 @@ theme: /
                 
             a: Лидер роста – {{$temp.leader.name}} ({{getPrettyPriceInRub($temp.leader.price)}} {{$temp.leader.difference > 0 ? "+" : "-"}}{{$temp.leader.difference * 100}}%)
             a: В отстающих – {{$temp.loser.name}} ({{getPrettyPriceInRub($temp.loser.price)}} {{$temp.loser.difference > 0 ? "+" : "-"}}{{$temp.loser.difference * 100}}%)
-
+            go!: /CallToAction
         state: FailedToObtainPrice
             a: Не удалось найти цену этой валюты относительно рубля.
             a: Попробуйте, пожалуйста, указать другую
@@ -53,7 +53,12 @@ theme: /
             a: Могу подсказать сколько стоила та или иная валюта вчера и сколько стоит сегодня
             script:
                 $session.experienced = true;
-        a: Какая валюта вас интересует?
+            a: Какая валюта вас интересует?
+        else:
+            random:
+                a: Какая валюта вас интересует?
+                a: Какая ещё валюта вас интересует?
+                a: Курс какой валюты вам так же интересен?
     state: Start
         q!: $regex</start>
         intent!: /привет
