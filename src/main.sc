@@ -1,7 +1,7 @@
-require: slotfilling/slotFilling.sc
+require: currency/currency.sc
   module = sys.zb-common
-theme: /
 
+theme: /
     state: Start
         q!: $regex</start>
         a: Начнём.
