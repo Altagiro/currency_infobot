@@ -10,6 +10,9 @@ init:
     $http.config({
         cacheTimeToLiveInSeconds: 1 * 60 * 30
     });
+    bind("postProcess", function($ctx){
+        log($ctx)
+    });
 
 patterns:
     # добавил тк по "доллар" сущности из коммона не активируются
